@@ -33,7 +33,7 @@ Open `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
   "mcpServers": {
     "proxyclaw": {
       "command": "npx",
-      "args": ["-y", "@proxyclaw/mcp-server"],
+      "args": ["-y", "proxyclaw-mcp-server"],
       "env": {
         "IPLOOP_API_KEY": "your_api_key_here"
       }
@@ -140,10 +140,10 @@ Force a new IP rotation.
 ## 📦 Advanced: Local Install
 
 ```bash
-npm install -g @proxyclaw/mcp-server
+npm install -g proxyclaw-mcp-server
 
 # Run directly
-IPLOOP_API_KEY=your_key proxyclaw-mcp
+IPLOOP_API_KEY=your_key proxyclaw-mcp-server
 ```
 
 Or with Docker:

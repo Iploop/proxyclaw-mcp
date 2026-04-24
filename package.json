@@ -1,5 +1,5 @@
 {
-  "name": "@proxyclaw/mcp-server",
+  "name": "proxyclaw-mcp-server",
   "version": "1.0.0",
   "description": "ProxyClaw MCP Server — Route web requests through 175M+ residential IPs from Claude, Cursor, and any MCP client",
   "main": "dist/index.js",
