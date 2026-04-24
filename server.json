@@ -6,12 +6,12 @@
     "url": "https://github.com/Iploop/proxyclaw-mcp",
     "source": "github"
   },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "proxyclaw-mcp-server",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "transport": {
         "type": "stdio"
       },
