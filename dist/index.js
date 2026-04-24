@@ -8,9 +8,8 @@ const PROXY_HOST = process.env.PROXY_HOST || "proxy.iploop.io";
 const PROXY_PORT = process.env.PROXY_PORT || "8880";
 const API_KEY = process.env.IPLOOP_API_KEY || "";
 if (!API_KEY) {
-    console.error("Error: IPLOOP_API_KEY environment variable is required.");
+    console.error("Warning: IPLOOP_API_KEY not set. Server will start but tools will return an error.");
     console.error("Get your free key at https://iploop.io/signup.html");
-    process.exit(1);
 }
 // ── Country list (195+ supported) ──
 const COUNTRIES = {
@@ -180,6 +179,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
+    if (!API_KEY) {
+        return {
+            content: [{ type: "text", text: "Error: IPLOOP_API_KEY environment variable is required. Get your free key at https://iploop.io/signup.html" }],
+            isError: true,
+        };
+    }
     // ── proxy_fetch ──
     if (name === "proxy_fetch") {
         const url = String(args?.url || "");
