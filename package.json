@@ -1,0 +1,45 @@
+{
+  "name": "@proxyclaw/mcp-server",
+  "version": "1.0.0",
+  "description": "ProxyClaw MCP Server — Route web requests through 175M+ residential IPs from Claude, Cursor, and any MCP client",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "proxyclaw-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": [
+    "mcp",
+    "proxy",
+    "residential",
+    "claude",
+    "ai",
+    "scraper",
+    "geo",
+    "iploop",
+    "proxyclaw"
+  ],
+  "author": "IPLoop <team@iploop.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Iploop/proxyclaw-mcp.git"
+  },
+  "homepage": "https://proxyclaw.ai",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.39",
+    "tsx": "^4.15.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
