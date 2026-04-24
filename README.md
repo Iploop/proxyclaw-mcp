@@ -16,6 +16,24 @@ Route web requests through 175M+ residential IPs across 195+ countries — direc
 - **Sticky sessions** — Same IP across multiple requests
 - **City & ISP targeting** — Pinpoint precision when you need it
 
+## ⚡ Node.js vs Python — Which One?
+
+We ship **two** MCP servers. Choose based on what you need:
+
+| | **This repo (Node.js)** | **[Python version](https://github.com/Iploop/proxyclaw-mcp-py)** |
+|---|---|---|
+| **What it does** | Proxy routing + fetch | Full anti-bot + headless render + structured extraction |
+| **Best for** | Simple fetches, geo-targeting | Scraping protected sites (Amazon, eBay, LinkedIn), JS-rendered pages |
+| **Anti-detection** | Chrome fingerprint headers | TLS JA3 spoofing + Playwright anti-detection |
+| **Install** | `npx proxyclaw-mcp-server` | `uvx proxyclaw-mcp-server[all]` |
+| **Tools** | 4 (fetch, check_ip, list_countries, rotate) | 6 (+ stealth fetch, render, scrape, extract) |
+
+**→ Use Node.js** if you just need to route requests through residential IPs.
+
+**→ Use Python** if you're scraping hard targets (Cloudflare, SPAs, React sites) or need structured data extraction from 60+ supported sites.
+
+Both use the same proxy network — just different levels of power.
+
 ---
 
 ## 🚀 Install (30 seconds)
