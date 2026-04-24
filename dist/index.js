@@ -168,7 +168,7 @@ const TOOLS = [
 // ── Server Setup ──
 const server = new Server({
     name: "proxyclaw-mcp",
-    version: "1.0.0",
+    version: "1.0.2",
 }, {
     capabilities: {
         tools: {},
@@ -207,8 +207,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
         const result = await curlThroughProxy(url, { country, city, session, asn, timeout });
         if (result.exitCode !== 0) {
+            const safeStderr = result.stderr.replace(new RegExp(API_KEY, "g"), "[REDACTED]");
             return {
-                content: [{ type: "text", text: `Proxy fetch failed (exit ${result.exitCode}):\n${result.stderr}` }],
+                content: [{ type: "text", text: `Proxy fetch failed (exit ${result.exitCode}):\n${safeStderr}` }],
                 isError: true,
             };
         }
