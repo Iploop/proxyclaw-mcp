@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.iploop/proxyclaw",
-  "description": "Residential proxy network MCP server. Route requests through 175M+ real IPs across 195+ countries with anti-bot bypass.",
+  "name": "io.github.Furhworld/proxyclaw",
+  "description": "Residential proxy MCP server. 175M+ IPs in 195+ countries with anti-bot bypass.",
   "repository": {
     "url": "https://github.com/Iploop/proxyclaw-mcp",
     "source": "github"
   },
-  "version": "1.0.1",
+  "version": "1.0.3",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "proxyclaw-mcp-server",
-      "version": "1.0.1",
+      "version": "1.0.3",
       "transport": {
         "type": "stdio"
       },
