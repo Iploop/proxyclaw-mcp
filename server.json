@@ -1,27 +1,41 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Furhworld/proxyclaw",
-  "description": "Residential proxy MCP server. 175M+ IPs in 195+ countries with anti-bot bypass.",
+  "description": "Residential proxy tools with explicit V2 credentials; city targeting is rollout-gated.",
   "repository": {
     "url": "https://github.com/Iploop/proxyclaw-mcp",
     "source": "github"
   },
-  "version": "1.0.4",
+  "version": "1.1.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "proxyclaw-mcp-server",
-      "version": "1.0.4",
+      "version": "1.1.0",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
-          "description": "Your ProxyClaw API key from iploop.io",
-          "isRequired": true,
+          "description": "Legacy account key; V2 account key is separate from proxy authentication",
+          "isRequired": false,
           "format": "string",
           "isSecret": true,
           "name": "IPLOOP_API_KEY"
+        },
+        {
+          "description": "V2 proxy username from platform.iploop.io; requires proxy password",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "IPLOOP_PROXY_USERNAME"
+        },
+        {
+          "description": "V2 proxy password; requires proxy username",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "IPLOOP_PROXY_PASSWORD"
         }
       ]
     }

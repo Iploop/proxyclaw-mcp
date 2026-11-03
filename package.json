@@ -1,8 +1,8 @@
 {
   "name": "proxyclaw-mcp-server",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "mcpName": "io.github.Furhworld/proxyclaw",
-  "description": "ProxyClaw MCP Server — Route web requests through 175M+ residential IPs from Claude, Cursor, and any MCP client",
+  "description": "Residential proxy MCP tools with explicit V2 credentials and legacy compatibility",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
@@ -11,7 +11,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "test": "npm run build && node --test tests/*.mjs"
   },
   "keywords": [
     "mcp",

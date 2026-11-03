@@ -1,91 +1,36 @@
-# Give Claude/Cursor Real Web Access with ProxyClaw MCP
+# ProxyClaw MCP — V2 source setup
 
-AI agents are great at reasoning, but most web-access tools still fetch from datacenter IPs. That is a problem when you need to test geo-specific content, verify SERPs by country, scrape regional pricing, or debug pages that treat datacenter traffic differently from real users.
+Residential proxy tools for compatible MCP clients. Get credentials at https://platform.iploop.io/.
 
-ProxyClaw MCP gives Claude Desktop, Cursor, Zed, and other MCP clients a residential proxy toolset directly inside the agent.
-
-## What is ProxyClaw MCP?
-
-ProxyClaw MCP is an open-source Model Context Protocol server for routing agent web requests through the IPLoop / ProxyClaw residential proxy network.
-
-It lets an AI agent:
-
-- fetch URLs through residential IPs
-- choose country/city targeting
-- verify the current exit IP
-- rotate sessions
-- use stronger Python anti-bot/rendering workflows when needed
-
-Node.js server:
-
+## Install the updated source
+The GitHub implementation is version 1.1.0. Do not assume the npm registry package or a registry catalog has been updated merely because this repository is current.
 ```bash
-npx proxyclaw-mcp-server
+git clone https://github.com/Iploop/proxyclaw-mcp.git
+cd proxyclaw-mcp
+npm ci
+npm run build
 ```
-
-Python server:
-
-```bash
-uvx proxyclaw-mcp-server[all]
-```
-
-## Claude Desktop config
-
+Configure your MCP client to run Node with the absolute path to `dist/index.js`:
 ```json
-{
-  "mcpServers": {
-    "proxyclaw": {
-      "command": "npx",
-      "args": ["-y", "proxyclaw-mcp-server"],
-      "env": {
-        "IPLOOP_API_KEY": "your_api_key_here"
-      }
-    }
-  }
-}
+{"mcpServers":{"proxyclaw":{"command":"node","args":["/ABSOLUTE/PATH/proxyclaw-mcp/dist/index.js"],"env":{"IPLOOP_API_KEY":"YOUR_ACCOUNT_API_KEY","IPLOOP_PROXY_USERNAME":"YOUR_PROXY_USERNAME","IPLOOP_PROXY_PASSWORD":"YOUR_PROXY_PASSWORD"}}}}
 ```
-
-Get a free key: https://iploop.io/signup.html
+Requires Node 18+, npm and curl. Key-only callers retain legacy mode; setting just one V2 proxy credential is rejected. Proxy settings are discovered from the HTTPS platform metadata.
 
 ## Tools
+- `proxy_fetch`: fetch a public URL; optional ISO country, sticky session, timeout.
+- `proxy_check_ip`: returns the observed exit for an optional country.
+- `proxy_list_countries`: reference country codes, **not live inventory**.
+- `proxy_rotate`: requests a new session; a distinct exit is not guaranteed.
 
-- `proxy_fetch` — fetch any URL through a residential proxy
-- `proxy_check_ip` — verify the exit IP and location
-- `proxy_list_countries` — list available country codes
-- `proxy_rotate` — rotate the session/IP
+Example `proxy_fetch`: `{"url":"https://example.com","country":"US","session":"demo123","timeout":15}`.
 
-The Python version adds:
+## V2 city targeting — pending deployment
+The `state` and `city` arguments remain V2 interfaces. They are not live on the current server rollout. The client rejects them until `IPLOOP_V2_CITY_ENABLED=1` is deliberately set **after** owner-confirmed backend deployment. City requests also require country and state. Do not enable that flag today or restart gateways for these client changes. V2 ASN targeting is unavailable.
 
-- `proxy_fetch_stealth`
-- `proxy_render`
-- `proxy_scrape`
-- `proxy_extract`
+## Safety and limits
+Country input is validated across all traffic tools; selectors and timeouts are validated before network use. Credentials pass to curl through stdin rather than process arguments. Error responses do not echo credentials. Target errors return tool errors; oversized responses are bounded. HTTPS targets protect target TLS, not necessarily the proxy authentication transport.
 
-## Example prompts
+No universal CAPTCHA/anti-bot, fixed exit, earnings, free quota or live inventory guarantee. Browser rendering and other SDKs require separate compatibility verification.
 
-> Check my exit IP through a US residential proxy.
-
-> Fetch this ecommerce page from Germany and summarize the visible pricing.
-
-> Compare this page from US vs UK exit IPs.
-
-> Rotate my proxy session and verify the new IP.
-
-## Why it matters
-
-Agents need real-world web context. Plain fetch tools are useful, but they do not reproduce how websites behave for residential users in different locations.
-
-ProxyClaw gives agents a more realistic network layer:
-
-- residential IPs
-- geo-targeting
-- sticky sessions
-- rotation
-- MCP-native workflow
-
-## Links
-
-- Node MCP: https://github.com/Iploop/proxyclaw-mcp
-- Python MCP: https://github.com/Iploop/proxyclaw-mcp-py
-- Docs: https://proxyclaw.ai/docs
-- npm: https://www.npmjs.com/package/proxyclaw-mcp-server
-- PyPI: https://pypi.org/project/proxyclaw-mcp-server/
+Tests: `npm test`. Current proxy/SDK guide: https://proxyclaw.ai/docs.html
+Support: support@iploop.io
