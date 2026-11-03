@@ -7,17 +7,7 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
-import { spawn } from "child_process";
-
-// ── Config ──
-const PROXY_HOST = process.env.PROXY_HOST || "proxy.iploop.io";
-const PROXY_PORT = process.env.PROXY_PORT || "8880";
-const API_KEY = process.env.IPLOOP_API_KEY || "";
-
-if (!API_KEY) {
-  console.error("Warning: IPLOOP_API_KEY not set. Server will start but tools will return an error.");
-  console.error("Get your free key at https://iploop.io/signup.html");
-}
+import { curlThroughProxy } from "./transport.js";
 
 // ── Country list (195+ supported) ──
 const COUNTRIES: Record<string, string> = {
@@ -61,54 +51,14 @@ const COUNTRIES: Record<string, string> = {
   GD: "Grenada", DM: "Dominica", BZ: "Belize",
 };
 
-// ── Helper: run curl through proxy ──
-function curlThroughProxy(
-  url: string,
-  opts: { country?: string; city?: string; session?: string; asn?: string; timeout?: number } = {}
-): Promise<{ stdout: string; stderr: string; exitCode: number }> {
-  return new Promise((resolve) => {
-    let auth = `:${API_KEY}`;
-    if (opts.country) auth += `-country-${opts.country.toUpperCase()}`;
-    if (opts.city) auth += `-city-${opts.city.toLowerCase()}`;
-    if (opts.session) auth += `-session-${opts.session}`;
-    if (opts.asn) auth += `-asn-${opts.asn}`;
-
-    const args = [
-      "--proxy", `http://${PROXY_HOST}:${PROXY_PORT}`,
-      "--proxy-user", auth,
-      "--max-time", String(opts.timeout || 30),
-      "--silent",
-      "--show-error",
-      "--location",
-      "-A", "ProxyClaw-MCP/1.0",
-      url,
-    ];
-
-    const proc = spawn("curl", args, { timeout: (opts.timeout || 30) * 1000 + 5000 });
-    let stdout = "";
-    let stderr = "";
-
-    proc.stdout.on("data", (data) => { stdout += data.toString(); });
-    proc.stderr.on("data", (data) => { stderr += data.toString(); });
-
-    proc.on("close", (exitCode) => {
-      resolve({ stdout, stderr, exitCode: exitCode ?? 1 });
-    });
-
-    proc.on("error", (err) => {
-      resolve({ stdout, stderr: err.message, exitCode: 1 });
-    });
-  });
-}
-
 // ── MCP Tools ──
 const TOOLS: Tool[] = [
   {
     name: "proxy_fetch",
     description:
       "Fetch a URL through the ProxyClaw residential proxy network. " +
-      "Routes the request through real residential IPs in 195+ countries. " +
-      "Use for geo-restricted content, anti-bot bypass, or multi-country research.",
+      "Uses residential proxy routing; country availability depends on the live pool. " +
+      "Use for public-page fetching and geo checks; target acceptance is not guaranteed.",
     inputSchema: {
       type: "object",
       properties: {
@@ -120,13 +70,14 @@ const TOOLS: Tool[] = [
           type: "string",
           description: "2-letter country code to route through (e.g., US, DE, JP). Auto-rotate if omitted.",
         },
+        state: { type: "string", description: "V2 state selector; pending server rollout" },
         city: {
           type: "string",
-          description: "City name for city-level targeting (optional)",
+          description: "V2 city selector; pending server rollout, requires country/state and explicit deployment gate",
         },
         session: {
           type: "string",
-          description: "Session ID for sticky IP (same IP across requests with same session ID)",
+          description: "Session ID for sticky routing; continuity depends on device availability",
         },
         asn: {
           type: "string",
@@ -159,7 +110,7 @@ const TOOLS: Tool[] = [
   {
     name: "proxy_list_countries",
     description:
-      "List all 195+ countries available for routing through the ProxyClaw residential network.",
+      "List reference country codes; not a live inventory or availability guarantee.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -169,8 +120,8 @@ const TOOLS: Tool[] = [
   {
     name: "proxy_rotate",
     description:
-      "Force IP rotation by fetching with a new random session. " +
-      "Returns the new exit IP to confirm rotation worked.",
+      "Request a new random session. " +
+      "Returns the observed exit; a distinct IP is not guaranteed.",
     inputSchema: {
       type: "object",
       properties: {
@@ -188,7 +139,7 @@ const TOOLS: Tool[] = [
 const server = new Server(
   {
     name: "proxyclaw-mcp",
-    version: "1.0.2",
+    version: "1.1.0",
   },
   {
     capabilities: {
@@ -204,13 +155,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
-  if (!API_KEY) {
-    return {
-      content: [{ type: "text", text: "Error: IPLOOP_API_KEY environment variable is required. Get your free key at https://iploop.io/signup.html" }],
-      isError: true,
-    };
-  }
-
   // ── proxy_fetch ──
   if (name === "proxy_fetch") {
     const url = String(args?.url || "");
@@ -222,22 +166,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     const country = args?.country ? String(args.country).toUpperCase() : undefined;
+    const state = args?.state ? String(args.state) : undefined;
     const city = args?.city ? String(args.city) : undefined;
     const session = args?.session ? String(args.session) : undefined;
     const asn = args?.asn ? String(args.asn) : undefined;
     const timeout = Math.min(120, Math.max(1, Number(args?.timeout || 30)));
 
-    if (country && !COUNTRIES[country]) {
-      return {
-        content: [{ type: "text", text: `Error: Unknown country code '${country}'. Use proxy_list_countries to see available options.` }],
-        isError: true,
-      };
-    }
-
-    const result = await curlThroughProxy(url, { country, city, session, asn, timeout });
+    const result = await curlThroughProxy(url, { country, state, city, session, asn, timeout });
 
     if (result.exitCode !== 0) {
-      const safeStderr = result.stderr.replace(new RegExp(API_KEY, "g"), "[REDACTED]");
+      const safeStderr = result.stderr;
       return {
         content: [{ type: "text", text: `Proxy fetch failed (exit ${result.exitCode}):\n${safeStderr}` }],
         isError: true,
@@ -279,14 +217,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       .join("\n");
 
     return {
-      content: [{ type: "text", text: `Available countries (${Object.keys(COUNTRIES).length}):\n\n${list}` }],
+      content: [{ type: "text", text: `Reference country codes (${Object.keys(COUNTRIES).length}); live availability varies:\n\n${list}` }],
     };
   }
 
   // ── proxy_rotate ──
   if (name === "proxy_rotate") {
     const country = args?.country ? String(args.country).toUpperCase() : undefined;
-    const sessionId = `rotate-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const sessionId = `rotate_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     const result = await curlThroughProxy("https://httpbin.org/ip", { country, session: sessionId, timeout: 15 });
 
@@ -298,7 +236,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     return {
-      content: [{ type: "text", text: `IP rotated (session: ${sessionId}):\n${result.stdout}` }],
+      content: [{ type: "text", text: `New session requested (session: ${sessionId}):\n${result.stdout}` }],
     };
   }
 
