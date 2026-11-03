@@ -16,10 +16,7 @@ export function validateOptions(opts: Options, env: NodeJS.ProcessEnv = process.
   if (v2) {
     if (!env.IPLOOP_PROXY_USERNAME || !env.IPLOOP_PROXY_PASSWORD || !/^[A-Za-z0-9_]+$/.test(env.IPLOOP_PROXY_USERNAME)) throw new Error('V2 requires both proxy username and proxy password');
     if (opts.asn) throw new Error('V2 ASN targeting is not available');
-    if (opts.state || opts.city) {
-      if (env.IPLOOP_V2_CITY_ENABLED !== '1') throw new Error('V2 state/city targeting is pending server rollout; not yet deployed');
-      if (!opts.country || (opts.city && !opts.state)) throw new Error('V2 city targeting requires country and state');
-    }
+    if ((opts.state || opts.city) && !opts.country) throw new Error('V2 state/city targeting requires country');
   } else {
     if (!env.IPLOOP_API_KEY) throw new Error('Get credentials at https://platform.iploop.io/');
     if (opts.state) throw new Error('State selector is a V2 capability');

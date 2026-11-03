@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Furhworld/proxyclaw",
-  "description": "Residential proxy tools with explicit V2 credentials; city targeting is rollout-gated.",
+  "description": "Residential proxy tools with explicit V2 credentials; state/city selectors supported; exact-city accuracy varies.",
   "repository": {
     "url": "https://github.com/Iploop/proxyclaw-mcp",
     "source": "github"
   },
-  "version": "1.1.0",
+  "version": "1.1.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "proxyclaw-mcp-server",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "transport": {
         "type": "stdio"
       },

@@ -22,12 +22,8 @@ export function validateOptions(opts, env = process.env) {
             throw new Error('V2 requires both proxy username and proxy password');
         if (opts.asn)
             throw new Error('V2 ASN targeting is not available');
-        if (opts.state || opts.city) {
-            if (env.IPLOOP_V2_CITY_ENABLED !== '1')
-                throw new Error('V2 state/city targeting is pending server rollout; not yet deployed');
-            if (!opts.country || (opts.city && !opts.state))
-                throw new Error('V2 city targeting requires country and state');
-        }
+        if ((opts.state || opts.city) && !opts.country)
+            throw new Error('V2 state/city targeting requires country');
     }
     else {
         if (!env.IPLOOP_API_KEY)

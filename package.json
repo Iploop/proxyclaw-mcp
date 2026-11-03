@@ -1,6 +1,6 @@
 {
   "name": "proxyclaw-mcp-server",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "mcpName": "io.github.Furhworld/proxyclaw",
   "description": "Residential proxy MCP tools with explicit V2 credentials and legacy compatibility",
   "main": "dist/index.js",

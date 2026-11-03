@@ -7,9 +7,10 @@ test('V2 uses username-side selectors',()=>assert.match(buildConfig('https://exa
 test('legacy remains key-only',()=>assert.match(buildConfig('https://example.com',{country:'US'},{IPLOOP_API_KEY:'legacy'}),/iploop:legacy-country-US/));
 test('partial V2 rejected',()=>assert.throws(()=>validateOptions({}, {IPLOOP_PROXY_USERNAME:'user123'})));
 test('invalid countries rejected',()=>{for(const country of ['ZZ','USA','US-session-x'])assert.throws(()=>validateOptions({country},env));});
-test('city rollout gated',()=>assert.throws(()=>validateOptions({country:'US',state:'tx',city:'austin'},env)));
+test('deployed city accepted by default',()=>assert.doesNotThrow(()=>validateOptions({country:'US',state:'tx',city:'austin'},env)));
 test('V2 future city format retained',()=>assert.match(buildConfig('https://example.com',{country:'US',state:'tx',city:'austin'},{...env,IPLOOP_V2_CITY_ENABLED:'1'},meta),/-country-us-state-tx-city-austin:/));
-test('city requires country and state',()=>assert.throws(()=>validateOptions({city:'austin'},{...env,IPLOOP_V2_CITY_ENABLED:'1'})));
+test('city requires country',()=>assert.throws(()=>validateOptions({city:'austin'},env)));
+test('country plus city without state accepted',()=>assert.doesNotThrow(()=>validateOptions({country:'US',city:'austin'},env)));
 test('invalid session rejected',()=>assert.throws(()=>validateOptions({session:'x-city-austin'},env)));
 test('V2 ASN unavailable',()=>assert.throws(()=>validateOptions({asn:'123'},env)));
 test('timeouts bounded',()=>{for(const timeout of [0,121,NaN,1.5])assert.throws(()=>validateOptions({timeout},env));});
