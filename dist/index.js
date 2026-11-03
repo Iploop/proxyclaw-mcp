@@ -62,10 +62,10 @@ const TOOLS = [
                     type: "string",
                     description: "2-letter country code to route through (e.g., US, DE, JP). Auto-rotate if omitted.",
                 },
-                state: { type: "string", description: "V2 state selector; pending server rollout" },
+                state: { type: "string", description: "V2 state selector; requires country" },
                 city: {
                     type: "string",
-                    description: "V2 city selector; pending server rollout, requires country/state and explicit deployment gate",
+                    description: "V2 city selector; requires country. Exact-city geolocation varies across providers",
                 },
                 session: {
                     type: "string",
@@ -126,7 +126,7 @@ const TOOLS = [
 // ── Server Setup ──
 const server = new Server({
     name: "proxyclaw-mcp",
-    version: "1.1.0",
+    version: "1.1.1",
 }, {
     capabilities: {
         tools: {},

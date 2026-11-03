@@ -1,7 +1,3 @@
-# V2 verification
+# Deployed V2 geography verification
 
-- TypeScript build and 14 transport tests passed.
-- Official MCP client over stdio: discovery, live fetch/check-IP/new-session, invalid-country rejection across all traffic tools, reference-country label and city deployment gate all passed (9 checks).
-- Dedicated QA account only. Legacy auth generation regression-tested; no claim of exhaustive legacy/live target certification.
-- City/state is V2 pending server deployment. No gateway restart or device SDK changes.
-- npm/catalog publishing is distinct from source publication. Follow README source setup for this V2 build.
+New SDK/CLI/MCP accept validated state/city by default. Require country, allow city without state. Legacy mode preserved; no gateway changes. Tests and real dedicated QA canaries are recorded in the task release report. State/city selectors are deployed in V2. Country is required; state is optional for a city request. Exact-city accuracy is not certified: some Austin test exits were labeled San Antonio or Schertz by independent geo services. Inspect the observed location when precision matters.

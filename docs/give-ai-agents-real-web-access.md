@@ -3,7 +3,7 @@
 Residential proxy tools for compatible MCP clients. Get credentials at https://platform.iploop.io/.
 
 ## Install the updated source
-The GitHub implementation is version 1.1.0. Do not assume the npm registry package or a registry catalog has been updated merely because this repository is current.
+The GitHub implementation is version 1.1.1. Do not assume the npm registry package or a registry catalog has been updated merely because this repository is current.
 ```bash
 git clone https://github.com/Iploop/proxyclaw-mcp.git
 cd proxyclaw-mcp
@@ -24,8 +24,8 @@ Requires Node 18+, npm and curl. Key-only callers retain legacy mode; setting ju
 
 Example `proxy_fetch`: `{"url":"https://example.com","country":"US","session":"demo123","timeout":15}`.
 
-## V2 city targeting — pending deployment
-The `state` and `city` arguments remain V2 interfaces. They are not live on the current server rollout. The client rejects them until `IPLOOP_V2_CITY_ENABLED=1` is deliberately set **after** owner-confirmed backend deployment. City requests also require country and state. Do not enable that flag today or restart gateways for these client changes. V2 ASN targeting is unavailable.
+## Deployed V2 state/city targeting
+Pass `country`, optional `state` and `city` in `proxy_fetch`. No feature flag is required. State/city selectors are deployed in V2. Country is required; state is optional for a city request. Exact-city accuracy is not certified: some Austin test exits were labeled San Antonio or Schertz by independent geo services. Inspect the observed location when precision matters. V2 ASN targeting remains unavailable.
 
 ## Safety and limits
 Country input is validated across all traffic tools; selectors and timeouts are validated before network use. Credentials pass to curl through stdin rather than process arguments. Error responses do not echo credentials. Target errors return tool errors; oversized responses are bounded. HTTPS targets protect target TLS, not necessarily the proxy authentication transport.
